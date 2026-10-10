@@ -162,6 +162,11 @@ stdenv.mkDerivation (finalAttrs: {
 - IFD - As Nix does not support importing/reading YAML files natively, we have
   to convert `pnpm-lock.yaml` files to JSON so we can parse them. This introduces
   a performance loss that other places can explain in much more detail.
+  On Nix with [`builtins.wasm`](https://determinate.systems/blog/builtins-wasm)
+  (Determinate Nix with the `wasm-builtin` experimental feature), the lock file
+  is parsed at evaluation time by the bundled
+  [nix-wasm-rust](https://github.com/DeterminateSystems/nix-wasm-rust) YAML
+  plugin instead, without IFD.
 - Manual hashes for tarballs - `pnpm-lock.yaml` does not store hashes for
   tarballs, and by extension Git sources. That means those will still need to be
   specified by hand, making automated updates by the likes of Renovate or

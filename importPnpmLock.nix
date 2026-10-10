@@ -20,19 +20,27 @@ let
     "9.0"
   ];
 
+  fromYAML = builtins.wasm {
+    path = ./wasm/nix_wasm_plugin_yaml.wasm;
+    function = "fromYAML";
+  };
+
   importYAMLDocuments =
     file:
-    let
-      json =
-        runCommand "${pname}-pnpm-lock.json"
-          {
-            nativeBuildInputs = [ yq-go ];
-          }
-          ''
-            yq --output-format json eval-all '[.]' ${file} > $out
-          '';
-    in
-    lib.importJSON json;
+    if builtins ? wasm then
+      fromYAML (builtins.readFile file)
+    else
+      let
+        json =
+          runCommand "${pname}-pnpm-lock.json"
+            {
+              nativeBuildInputs = [ yq-go ];
+            }
+            ''
+              yq --output-format json eval-all '[.]' ${file} > $out
+            '';
+      in
+      lib.importJSON json;
 
   splitName = builtins.match "^(@?[^@]+)@(.+)$";
 
