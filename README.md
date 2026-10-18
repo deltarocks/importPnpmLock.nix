@@ -117,6 +117,10 @@ stdenv.mkDerivation (finalAttrs: {
       "my-weird-unstable-package@https://codeload.github.com/copilot/my-weird-unstable-package/tar.gz/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" =
         "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
     };
+
+    # Download with Nix's builtin fetcher instead of nixpkgs' fetchurl, so
+    # credentials from `netrc-file` in nix.conf apply (e.g. private registries)
+    #  useBuiltinFetchurl = true;
   };
 
   nativeBuildInputs = [

@@ -79,6 +79,10 @@
           test-pnpm_12 = pkgs.callPackage ./checks/test-pnpm_12.nix {
             inherit (ourPackages) importPnpmLock iplConfigHook;
           };
+          builtin-fetchurl = pkgs.callPackage ./checks/test-pnpm_12.nix {
+            inherit (ourPackages) iplConfigHook;
+            importPnpmLock = args: ourPackages.importPnpmLock (args // { useBuiltinFetchurl = true; });
+          };
           with-gyp = pkgs.callPackage ./checks/with-gyp {
             inherit (ourPackages) importPnpmLock iplConfigHook;
           };

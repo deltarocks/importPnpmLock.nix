@@ -14,6 +14,7 @@
   version,
   lockFile,
   manualEntries ? { },
+  useBuiltinFetchurl ? false,
 }:
 let
   supportedLockFileVersions = [
@@ -94,6 +95,14 @@ let
   filterPackageEntry = _: package: (package.resolution or { }).type or null != "directory";
 
   lockFileVersion = data.lockfileVersion or null;
+
+  fetch =
+    if useBuiltinFetchurl then
+      mitm-cache.fetch.override {
+        fetchurl = { url, hash }: import <nix/fetchurl.nix> { inherit url hash; };
+      }
+    else
+      mitm-cache.fetch;
 in
 assert lib.assertMsg (lockFileVersion != null) ''
   lockFile ${lockFile} does not look like a supported lock file.
@@ -110,7 +119,7 @@ assert lib.assertMsg (data ? packages) ''
   File ${lockFile} does not contain a list of locked packages.
   Is it a valid lock file?
 '';
-mitm-cache.fetch {
+fetch {
   name = "${pname}-pnpm-mitm-cache-${version}";
   data = lib.mapAttrs' mapPackageToMitmCacheEntry (lib.filterAttrs filterPackageEntry data.packages);
 }
